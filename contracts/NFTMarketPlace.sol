@@ -1,9 +1,9 @@
-
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC71/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/ERC71/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import "hardhat/console.sol";
 
@@ -28,9 +28,9 @@ contract NFTMarketPlace is ERC721URIStorage {
     } 
 
     event MarketItemCreated(
-        uint256 tokenId,
-        address payable seller,
-        address payable owner,
+        uint256 indexed tokenId,
+        address  seller,
+        address  owner,
         uint256 price,
         bool sold
     );
@@ -39,16 +39,16 @@ contract NFTMarketPlace is ERC721URIStorage {
         owner = payable(msg.sender);
     }
 
-    function updateListingPrice(unit _listingPrice) public payable {
+    function updateListingPrice(uint _listingPrice) public payable {
         require(owner == msg.sender, "Only marketplace owner can update the listing price");
         listingPrice = _listingPrice;
     }
 
-    function getListingPrice() public view return (uint256){
+    function getListingPrice() public view returns (uint256){
         return listingPrice;
     }
 
-    function createToken(string memory tokenURI, unit256 price) public payable returns (unit){
+    function createToken(string memory tokenURI, uint256 price) public payable returns (uint){
         _tokenIds.increment();
 
         uint256 newTokenId = _tokenIds.current();
@@ -56,11 +56,11 @@ contract NFTMarketPlace is ERC721URIStorage {
         _mint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
 
-        createMarketItem(newToken, price);
+        createMarketItem(newTokenId, price);
 
         return newTokenId; 
     } 
-    function createMarketItem(uint256 tokenId, uint56 price) private{
+    function createMarketItem(uint256 tokenId, uint256 price) private{
         require(price>0, "Price must be at least 1");
         require(msg.value == listingPrice, "Price must be equal to listing price");
 
@@ -73,11 +73,11 @@ contract NFTMarketPlace is ERC721URIStorage {
         );
 
         _transfer(msg.sender, address(this), tokenId);
-        emit MarketItemCard(tokenId, msg.sender, address(this), price, false);
+        emit MarketItemCreated(tokenId, msg.sender, address(this), price, false);
     }
 
     function resellToken(uint256 tokenId, uint256 price) public payable{
-        require(idToMarketItem[item].owner == msg.sender, "Only item owner can perform this operation")
+        require(idToMarketItem[tokenId].owner == msg.sender, "Only item owner can perform this operation");
         require(msg.value == listingPrice, "Price must be equal to listing price");
 
         idToMarketItem[tokenId].sold = false;
@@ -108,7 +108,7 @@ contract NFTMarketPlace is ERC721URIStorage {
 
     }
 
-    function fetchMarketItems() public view returns (MarketItems[] memory){
+    function fetchMarketItems() public view returns (MarketItem[] memory){
         uint itemCount = _tokenIds.current();
         uint unsoldItemCount = _tokenIds.current() - _itemsSold.current();
         uint currentIndex = 0;

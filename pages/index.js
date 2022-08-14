@@ -82,7 +82,7 @@ const Home = () => {
                         layout="fill"
                         objectFit="contain"
                         alt="left-arrow"
-                        className={theme === 'light' && 'filter invert'}
+                        className={`${theme === 'light' && 'filter invert'}`}
                       />
                     </div>
 
@@ -95,7 +95,9 @@ const Home = () => {
                         layout="fill"
                         objectFit="contain"
                         alt="left-arrow"
-                        className={theme === 'light' && 'filter invert'}
+
+                        // eslint-disable-next-line react/jsx-props-no-multi-spaces
+                        className={`${theme === 'light' && 'filter invert'}`}
                       />
                     </div>
                   </>
